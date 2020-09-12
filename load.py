@@ -18,18 +18,14 @@ def create_database(db_file, table_headers, table_rows):
     try:
         with sqlite3.connect(db_file) as con:
             table_name = db_file.split('.')[0]
-            table_headers = list(table_headers)
-            for i in range(len(table_headers)):
-                if table_headers[i] == '':
-                    table_headers[i] = 'Column'
-            table_headers = tuple(table_headers)
+            table_name = ''.join(e for e in table_name if e.isalnum())
             query = f"create table {table_name} {table_headers}"
             print (query)
             con.execute(query)
             for i in table_rows:
-                con.execute(f"insert into {table_name} values {i}")
-            # print(table_headers)
-            # print(table_rows)
+                query = f"insert into {table_name} values {i}"
+                con.execute(query)
+                print(query)
     except Exception as e:
         print(e)
     finally:
@@ -40,6 +36,7 @@ def main():
 
     #get filename from user
     filename = input()
+    db_filename = filename.split('.')[0] + '.sqlite3'
 
     # load load the values from the csv file
     csv_list = loadcsv(filename)
@@ -48,7 +45,7 @@ def main():
     # write into DB
     table_headers = csv_list[0]
     table_rows = csv_list[1:]
-    create_database(f"{filename.split('.')[0]}.sqlite3",table_headers,table_rows)
+    create_database(db_filename,table_headers,table_rows)
 
 
 if __name__ == '__main__':
